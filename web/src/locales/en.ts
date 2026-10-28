@@ -2622,6 +2622,8 @@ Example: Virtual Hosted Style`,
       modified: 'Modified',
       created: 'Created',
       deleted: 'Deleted',
+      deleteIncomplete:
+        'Could not confirm complete deletion. Check the remaining documents before retrying.',
       noLangfuseConfigToDelete: 'No Langfuse configuration to delete',
       renamed: 'Renamed',
       operated: 'Operated',
@@ -2845,20 +2847,6 @@ Best for: Documents with flowing, contextually connected content — such as boo
       toolTimeout: 'Tool timeout',
       toolTimeoutTip:
         'Timeout in seconds for a single tool call (including MCP tools). Increase it for long-running tools.',
-      maxSteps: 'Max steps',
-      headless: 'Headless',
-      enableDefaultExtensions: 'Enable default extensions',
-      enableDefaultExtensionsTip:
-        'Enable browser-use default extensions (uBlock, cookie handling, ClearURLs). Disable this to avoid runtime extension downloads.',
-      chromiumSandbox: 'Chromium sandbox',
-      chromiumSandboxTip:
-        'Whether to enable Chromium sandbox. In Docker root environments this is usually disabled; on regular hosts it is recommended to enable.',
-      persistSession: 'Persist session',
-      persistSessionTip:
-        'When enabled, this Browser node reuses its browser session to avoid repeated logins.',
-      uploadSources: 'Upload sources',
-      uploadSourcesTip:
-        'Supports file IDs, file URLs, or variables. You can separate multiple values with commas or use a JSON array format (for example ["id1","https://example.com/a.pdf"]).',
       advancedSettings: 'Advanced settings',
       addTools: 'Add tools',
       sysPromptDefaultValue: `
@@ -3009,9 +2997,6 @@ Best for: Documents with flowing, contextually connected content — such as boo
         'The absolute HTTP or HTTPS URL of the page to read. As an agent tool, the agent supplies the URL.',
       docGenerator: 'Doc Generator',
       docGeneratorDescription: `Generate a file from Markdown content.`,
-      browser: 'Browser',
-      browserDescription:
-        'Automate browser tasks. Supports model configuration and prompt-driven actions. Upload sources support file IDs and URLs, and downloaded files can be saved to a target folder.',
       subtitle: 'Subtitle',
       logoImage: 'Logo Image',
       logoPosition: 'Logo Position',
@@ -3453,6 +3438,10 @@ This delimiter is used to split the input text into several text pieces echo of 
         latest: 'Latest version',
         filterByAlias: 'Filter by alias',
         alias: 'Alias',
+        addAlias: 'Add alias',
+        editAlias: 'Edit alias',
+        editAliasDescription:
+          'Give this version a memorable alias so you can find it quickly later.',
         pinnedTooltip:
           'This dataset is pinned to a specific version. New versions published on the agent will not affect it.',
         outdated:
@@ -3596,9 +3585,6 @@ This process aggregates variables from multiple branches into a single variable 
         'Write your SQL query here. You can use variables, raw SQL, or mix both using variable syntax.',
       frameworkPrompts: 'Framework',
       release: 'Publish',
-      production: 'Production',
-      productionTooltip:
-        'This version is published to production. Access it via the API or the embedded page.',
       confirmPublish: 'Confirm publish',
       publishIngestionPipeline:
         'You are about to publish this Ingestion pipeline.',
@@ -4104,10 +4090,10 @@ Important structured information may include: names, dates, locations, events, k
         share: 'Share',
       },
 
-      serviceStatus: 'Service status',
-      userManagement: 'User management',
-      sandboxSettings: 'Sandbox settings',
-      registrationWhitelist: 'Registration whitelist',
+      serviceStatus: 'Services',
+      userManagement: 'Users',
+      sandboxSettings: 'Sandbox',
+      registrationWhitelist: 'Whitelist',
       roles: 'Roles',
       monitoring: 'Monitoring',
 
@@ -4211,7 +4197,7 @@ Important structured information may include: names, dates, locations, events, k
       importWhitelist: 'Import whitelist (Excel)',
       importSelectExcelFile: 'Excel file (.xlsx)',
       importOverwriteExistingEmails: 'Overwrite existing emails',
-      importInvalidExcelFile: 'Please select a valid Excel file',
+      importValidExcelFile: 'Please select a valid Excel file',
       importFileRequired: 'Please select a file to import',
       importFileTips:
         'File must contain a single header column named <code>email</code>.',
