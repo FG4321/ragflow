@@ -58,7 +58,6 @@ export default {
       viewLess: 'View less',
       comingSoon: 'Coming soon',
       download: 'Download',
-      figure: 'Fig.',
       close: 'Close',
       preview: 'Preview',
       move: 'Move',
@@ -2914,6 +2913,7 @@ Best for: Documents with flowing, contextually connected content — such as boo
       operation: 'operation',
       run: 'Run',
       save: 'Save',
+      saveDraft: 'Save draft',
       title: 'ID:',
       beginDescription: 'This is where the flow begins.',
       answerDescription: `A component that serves as the interface between human and bot, receiving user inputs and displaying the agent's responses.`,
@@ -3453,7 +3453,9 @@ This delimiter is used to split the input text into several text pieces echo of 
         deleteConfirmTitle: 'Delete this version?',
         deleteConfirmContent:
           'Deleting a version that a dataset or file is bound to will make that file unparseable. This cannot be undone.',
-        restore: 'Restore as current',
+        deleteAgentConfirmContent:
+          'If this agent is embedded in a website or serving external traffic, deleting its latest published version will roll back or interrupt the live service. Your current canvas is not affected. This cannot be undone.',
+        restore: 'Restore as current draft',
         restoreConfirmTitle: 'Restore this version as the current agent?',
         restoreConfirmContent:
           'The current agent DSL will be replaced by this version. Save again to create a new version.',
@@ -3590,7 +3592,6 @@ This process aggregates variables from multiple branches into a single variable 
       publishIngestionPipeline:
         'You are about to publish this Ingestion pipeline.',
       publishAgent: 'You are about to publish this agent',
-      linkedDataset: 'Linked dataset:',
       lastPublished: 'Last published',
       createFromBlank: 'Create from blank',
       createFromTemplate: 'Create from template',
