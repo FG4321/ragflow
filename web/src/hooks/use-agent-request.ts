@@ -34,10 +34,7 @@ import {
   ITraceData,
   IWebhookTrace,
 } from '@/interfaces/database/agent';
-import {
-  IAgentWebhookTraceRequest,
-  IDebugSingleRequestBody,
-} from '@/interfaces/request/agent';
+import { IAgentWebhookTraceRequest } from '@/interfaces/request/agent';
 import i18n from '@/locales/config';
 import { IInputs } from '@/pages/agent/interface';
 import { useGetSharedChatSearchParams } from '@/pages/next-chats/hooks/use-send-shared-message';
@@ -112,7 +109,6 @@ export const enum AgentApiAction {
   FetchSharedAgent = 'fetchSharedAgent',
   FetchAgentTags = 'fetchAgentTags',
   UpdateAgentTags = 'updateAgentTags',
-  FetchPipelineNodes = 'fetchPipelineNodes',
   FetchBuiltinPipelineList = 'fetchBuiltinPipelineList',
   FetchBuiltinPipelineDetail = 'fetchBuiltinPipelineDetail',
 }
@@ -732,35 +728,6 @@ export const useTestDbConnect = () => {
   return { data, loading, testDbConnect: mutateAsync };
 };
 
-export const useDebugSingle = () => {
-  const { id } = useParams();
-  const {
-    data,
-    isPending: loading,
-    mutateAsync,
-  } = useMutation({
-    mutationKey: [AgentApiAction.DebugSingle],
-    mutationFn: async (params: IDebugSingleRequestBody) => {
-      const ret = await agentService.debugSingle(
-        {
-          agentId: id as string,
-          componentId: params.component_id,
-          data: {
-            params: params.params,
-          },
-        },
-        true,
-      );
-      if (ret?.data?.code !== 0) {
-        message.error(ret?.data?.message);
-      }
-      return ret?.data?.data;
-    },
-  });
-
-  return { data, loading, debugSingle: mutateAsync };
-};
-
 export const useFetchInputForm = (componentId?: string) => {
   const { id } = useParams();
 
@@ -974,6 +941,34 @@ export const useUpdateVersion = () => {
   return { loading, isError, updateVersion: mutateAsync };
 };
 
+// Shared query options for a single canvas version's detail (IFlow, dsl
+// included). Both useFetchVersion (canvas version dialog) and
+// useFetchPipelineDslByPipelineId (operator tabs) must cache the same shape
+// under AgentKeys.version so they can share the entry safely.
+const canvasVersionQuery = (agentId?: string, versionId?: string) => ({
+  queryKey: AgentKeys.version(agentId, versionId),
+  gcTime: 0,
+  // A pruned version never recovers on retry, and each attempt would
+  // re-fire the error path.
+  retry: false,
+  queryFn: async (): Promise<IFlow | undefined> => {
+    if (!agentId || !versionId) return undefined;
+
+    // Consumers render their own error/empty state, so suppress the global
+    // notification whose "no permission" wording misleads here.
+    const { data } = await agentService.fetchVersion(
+      { agentId, versionId, skipGlobalErrorNotification: true },
+      true,
+    );
+
+    if (data?.code !== 0) {
+      throw new Error(data?.message);
+    }
+
+    return data?.data ?? undefined;
+  },
+});
+
 export const useFetchVersion = (
   version_id?: string,
 ): {
@@ -987,33 +982,8 @@ export const useFetchVersion = (
     isFetching: loading,
     isError,
   } = useQuery({
-    queryKey: AgentKeys.version(id, version_id),
-    initialData: undefined,
-    gcTime: 0,
-    // A pruned version never recovers on retry, and each attempt would
-    // re-fire the global error notification.
-    retry: false,
+    ...canvasVersionQuery(id, version_id),
     enabled: !!id && !!version_id,
-    queryFn: async () => {
-      if (!id || !version_id) return undefined;
-
-      // The dialog renders its own error state, so suppress the global
-      // notification whose "no permission" wording misleads here.
-      const { data } = await agentService.fetchVersion(
-        {
-          agentId: id,
-          versionId: version_id,
-          skipGlobalErrorNotification: true,
-        },
-        true,
-      );
-
-      if (data?.code !== 0) {
-        throw new Error(data?.message);
-      }
-
-      return data?.data ?? undefined;
-    },
   });
 
   return { data, loading, isError };
@@ -1494,25 +1464,32 @@ export const useExportAgentLog = () => {
   return { exportLogs: mutateAsync, loading };
 };
 
+// useFetchPipelineDslByPipelineId loads the DSL that backs the pipeline
+// operator tabs. Builtin pipelines have no version concept and are fetched
+// directly; a dataflow pipeline is versioned, so its DSL comes from the
+// selected canvas version — without a version id nothing is fetched and the
+// tabs stay hidden.
 export const useFetchPipelineDslByPipelineId = (
   pipelineId?: string,
+  versionId?: string,
   isBuiltin = false,
 ) => {
-  const { data: dsl, isFetching: loading } = useQuery({
-    queryKey: isBuiltin
-      ? BuiltinPipelineKeys.detail(pipelineId!)
-      : [AgentApiAction.FetchPipelineNodes, pipelineId],
-    initialData: {},
+  const { data: builtinDsl, isFetching: builtinLoading } = useQuery({
+    queryKey: BuiltinPipelineKeys.detail(pipelineId!),
     gcTime: 0,
-    enabled: !!pipelineId,
-    queryFn: async () => {
-      const { data } = isBuiltin
-        ? await agentService.getBuiltinPipeline(pipelineId!)
-        : await agentService.getAgent(pipelineId!);
-      const flow = data?.data;
-      return flow?.dsl ?? {};
+    enabled: isBuiltin && !!pipelineId,
+    queryFn: async (): Promise<DSL | undefined> => {
+      const { data } = await agentService.getBuiltinPipeline(pipelineId!);
+      return data?.data?.dsl;
     },
   });
+  const { data: version, isFetching: versionLoading } = useQuery({
+    ...canvasVersionQuery(pipelineId, versionId),
+    enabled: !isBuiltin && !!pipelineId && !!versionId,
+  });
 
-  return { dsl, loading };
+  return {
+    dsl: isBuiltin ? builtinDsl : version?.dsl,
+    loading: isBuiltin ? builtinLoading : versionLoading,
+  };
 };

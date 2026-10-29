@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { AlertCircle, TriangleAlert } from 'lucide-react';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { PipelineVersionLabel } from '../pipeline-version-label';
 import { TreeSelect, TreeSelectNode } from '../tree-select';
 import { useParserTreeData } from './use-parser-tree-data';
 
@@ -84,12 +85,12 @@ export function ParserTreeSelect({
       const alias = node.data?.alias;
       if (alias) {
         return (
-          <span className="flex w-full min-w-0 items-center gap-1.5">
-            <span className="truncate">{node.data?.title}</span>
-            <span className="max-w-[30%] shrink-0 truncate text-text-secondary">
-              {alias}
-            </span>
-          </span>
+          <PipelineVersionLabel
+            title={node.data?.title ?? ''}
+            alias={alias}
+            className="w-full"
+            aliasClassName="max-w-[30%]"
+          />
         );
       }
       return node.label ?? node.title;
@@ -115,11 +116,15 @@ export function ParserTreeSelect({
     [t],
   );
 
-  // The outdated icon is a pure hint: the tooltip trigger swallows its own
-  // click before it bubbles to the TreeSelect trigger, so clicking the icon
-  // neither toggles the dropdown nor triggers the lazy version fetches that
-  // follow. It is hidden while the value is already reported as missing — a
-  // deleted pin is the stronger signal.
+  // The outdated icon is a pure hint. The Radix tooltip trigger renders a
+  // raw <button> with no `type`, which inside the surrounding forms (dataset
+  // settings, document pipeline dialog) defaults to type="submit" — clicking
+  // the icon would submit the form, and stopPropagation alone cannot cancel
+  // that native default action. type="button" removes it, while the click
+  // handlers still swallow the event before it bubbles to the TreeSelect
+  // trigger, so the click neither toggles the dropdown nor triggers the lazy
+  // version fetches that follow. It is hidden while the value is already
+  // reported as missing — a deleted pin is the stronger signal.
   const stopHintClick = useCallback((e: React.SyntheticEvent) => {
     e.stopPropagation();
   }, []);
@@ -128,10 +133,11 @@ export function ParserTreeSelect({
     outdated && (loading || selectedLeafExists) ? (
       <RAGFlowTooltip
         tooltip={t('flow.version.outdated')}
+        type="button"
         onClick={stopHintClick}
         onPointerDown={stopHintClick}
       >
-        <AlertCircle className="size-4 flex-shrink-0" />
+        <AlertCircle className="size-4 flex-shrink-0 text-state-warning" />
       </RAGFlowTooltip>
     ) : undefined;
 

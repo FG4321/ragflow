@@ -1760,6 +1760,7 @@ NER：使用 spaCy NER 和基于规则的关键词提取来抽取 Entities 和 R
       apiKey: 'API Key',
       apiKeyMessage: '请输入API Key',
       apiKeyPlaceholder: '请输入API Key',
+      credentialClearToRemove: '清空此字段并保存即可移除已保存的凭据',
       apiKeyTip: 'API Key可以通过注册相应的LLM供应商来获取。',
       aimlapiGetKey: '获取 API Key',
       aimlapiCheckStatus: '检查状态',
@@ -1798,6 +1799,10 @@ NER：使用 spaCy NER 和基于规则的关键词提取来抽取 Entities 和 R
       mineruApiserver: 'MinerU API 服务器',
       mineruApiserverMessage: '请输入 MinerU API 服务器地址！',
       mineruApiserverPlaceholder: '例如：http://host.docker.internal:9987',
+      mineruApiToken: 'MinerU API Token',
+      mineruApiTokenPlaceholder: 'mineru.net API 管理页创建的 Token（可选）',
+      mineruApiTokenTip:
+        '填写后走官方精准解析（/api/v4，支持 vlm）。留空则使用免登录的 Agent 轻量接口。自建 MinerU 不需要填写。',
       mineruOutputDir: 'MinerU 输出目录',
       mineruOutputDirMessage: '请输入 MinerU 输出目录！',
       mineruOutputDirPlaceholder: '/tmp/mineru',
@@ -2034,6 +2039,7 @@ NER：使用 spaCy NER 和基于规则的关键词提取来抽取 Entities 和 R
       batchAddModels: '添加全部模型',
       batchRemoveModels: '移除全部模型',
       batchVerifyModels: '验证全部模型',
+      moreActions: '更多操作',
       editCustomModelTitle: '编辑模型',
       modelMaxTokens: '最大上下文长度',
       modelTypes: {
@@ -2478,9 +2484,7 @@ NER：使用 spaCy NER 和基于规则的关键词提取来抽取 Entities 和 R
         editAlias: '编辑别名',
         editAliasDescription:
           '为该版本设置一个便于识别的别名，方便后续快速查找。',
-        pinnedTooltip:
-          '该数据集已固定到特定版本。智能体新发布的版本不会影响它。',
-        outdated: '固定的版本不是最新版本。点击了解详情；我们不会自动升级它。',
+        outdated: '当前配置的数据管道版本不是最新版本，也不会自动更新。',
         delete: '删除版本',
         deleteConfirmTitle: '删除该版本？',
         deleteConfirmContent:
@@ -3122,7 +3126,7 @@ NER：使用 spaCy NER 和基于规则的关键词提取来抽取 Entities 和 R
         compilationOperator: '编译算子',
         workflow: '工作流',
       },
-      parser: '解析器',
+      parser: 'Parser',
       parserDescription: '从文件中提取原始文本和结构以供下游处理。',
       tokenizer: 'Indexer',
       tokenizerRequired: '请先添加索引器节点',
@@ -3162,14 +3166,14 @@ NER：使用 spaCy NER 和基于规则的关键词提取来抽取 Entities 和 R
         '根据分词器长度将文本拆分成块，并带有可选的分隔符和重叠。',
       titleChunkerDescription:
         '按标题层级拆分文档。通过正则表达式定义各级标题，再选择层级或分组模式控制切片方式。',
-      titleChunker: '按标题分块',
+      titleChunker: 'Title Chunker',
       manualChunkerDescription:
         '手册类文档分块方式，适用于产品手册、用户指南等，可根据文档结构进行分块并保留必要的上下文。',
       oneChunkerDescription: '此 Chunker 无需额外配置。',
       qAChunkerDescription: '此 Chunker 无需额外配置。',
       tableChunkerDescription: '此 Chunker 无需额外配置。',
       pageChunkerDescription: '此 Chunker 无需额外配置。',
-      extractor: '提取器',
+      extractor: 'Transformer',
       extractorDescription:
         '使用 LLM 从文档块（例如摘要、分类等）中提取结构化见解。',
       compiler: 'Compiler',
