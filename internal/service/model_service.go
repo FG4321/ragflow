@@ -1718,6 +1718,11 @@ func verifyASRModel(ctx context.Context, driver modelModule.ModelDriver, modelNa
 // providers return an error or empty text for such a trivial image;
 // we accept any non-error response as a successful connectivity check.
 func verifyOCRModel(ctx context.Context, driver modelModule.ModelDriver, modelName string, apiConfig *modelModule.APIConfig) error {
+	if verifier, ok := driver.(interface {
+		VerifyOCRConnection(context.Context, *modelModule.APIConfig) error
+	}); ok {
+		return verifier.VerifyOCRConnection(ctx, apiConfig)
+	}
 	// Send a minimal 1×1 white PNG through the OCR pipeline to verify
 	// connectivity. Most OCRModel drivers only check server reachability
 	// rather than performing full document parsing.
@@ -3105,10 +3110,14 @@ func (m *ModelProviderService) ListAllModels(pageIndex, pageSize int) ([]map[str
 	if err != nil {
 		return nil, err
 	}
-	if pageSize > 0 && pageIndex >= 0 && pageIndex*pageSize < len(models) {
-		return models[pageIndex*pageSize : (pageIndex+1)*pageSize], nil
+	if err := common.ValidatePagination(&pageIndex, &pageSize, nil); err != nil {
+		return nil, err
 	}
-	return models, nil
+	start := (pageIndex - 1) * pageSize
+	if start >= len(models) {
+		return []map[string]interface{}{}, nil
+	}
+	return models[start:min(start+pageSize, len(models))], nil
 }
 
 func (m *ModelProviderService) ShowModel(modelName string) (*modelModule.Model, error) {
